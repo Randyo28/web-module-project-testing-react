@@ -1,4 +1,12 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import Display from './../Display';
 
+test("renders without error", () => {
+    render(<Display/> )
+    expect(1).toEqual(1)
+    
+});
 
 
 
