@@ -1,12 +1,89 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import Display from './../Display';
+import Show from './../Show';
+import userEvent from '@testing-library/user-event';
 
+const testShow = {
+    //add in approprate test data structure here.
+    name: '',
+	summary: '',
+	seasons: [
+		{
+			id: '1',
+			name: 'Season-1',
+            _embedded: {
+                episodes: [{}],
+            }
+		},
+		{
+			id: '2',
+			name: 'Season-2',
+            _embedded: {
+                episodes: [{}],
+            }
+		},
+		{
+			id: '3',
+			name: 'Season-3',
+            _embedded: {
+                episodes: [{}],
+            }
+}]}
 
+test("renders without error", () => {
+    render(<Display/> )
+    expect(1).toEqual(1)
+    
+});
 
+test("renders show Component when fetch button is pressed", async () => {
 
+    //Arrange
+    render(<Display show={testShow}/> )
+    expect(1).toEqual(1)
 
+    //Act
+    const button = screen.getByRole('button')
+    userEvent.click(button)
+    
+    const showContainer = await screen.findByTestId('show-container')
+    
+    //Assert
+    expect(showContainer).toBeInTheDocument()
+    expect(showContainer).toBeTruthy()
+});
 
+test("select options rendered is equal to the amount of seasons", async () => {
+  //Arrange
+  render(<Display show={null}/> )
 
+  //Act
+  const button = screen.getByRole('button')
+  userEvent.click(button)
+  
+  const seasons = await screen.findAllByTestId('season-option')
+//   screen.debug(seasons)
 
+  //Assert
+  expect(seasons).toHaveLength(4)
+});
 
+test("Option function is called when button presses", async () => {
+    const mockDisplay = jest.fn(() => {
+        console.log('This is fake data')
+    })
+  //Arrange
+  render(<Display handleClick={() => {
+      mockDisplay('Tiis is fake data')}} displayFunc={mockDisplay}/> )
+
+  //Act
+  const button = screen.getByRole('button')
+  userEvent.click(button)
+  
+  //Assert
+  expect(mockDisplay.mock.calls.length).toBe(2)
+});
 
 
 
