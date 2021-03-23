@@ -1,8 +1,9 @@
 import React from 'react';
-import { queryByRole, render, screen } from '@testing-library/react';
+import { getByTestId, queryByRole, queryByTestId, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import Show from './../Show';
+import Loading from './../Loading';
 
 const testShow = {
     //add in approprate test data structure here.
@@ -11,37 +12,97 @@ const testShow = {
 	seasons: [
 		{
 			id: '1',
-			name: 'Season 1',
-            episodes: [],
+			name: 'Season-1',
+            _embedded: {
+                episodes: [{}],
+            }
 		},
 		{
 			id: '2',
-			name: 'Season 2',
-            episodes: [],
+			name: 'Season-2',
+            _embedded: {
+                episodes: [{}],
+            }
 		},
 		{
 			id: '3',
-			name: 'Season 3',
-            episodes: [],
+			name: 'Season-3',
+            _embedded: {
+                episodes: [{}],
+            }
 }]}
 
 test('renders testShow and no selected Season without errors', ()=>{
     render(<Show show={testShow} selectedSeason={'none'}/> )
 
-    screen.debug()
-    
 });
 
 test('renders Loading component when prop show is null', () => {
+    //Arrange
+    const { rerender } = render(<Show show={null} selectedSeason={'none'}/> )
+
+    //Act
+    rerender(<Show/>)
+    const loading = screen.getByTestId('loading-container')
+    
+    //Assert
+    expect(<Loading/>).toBeTruthy()
+    expect(loading).toBeInTheDocument()
+    expect(loading).toHaveTextContent('Fetching data...')
+    // screen.debug(loading)
 });
 
 test('renders same number of options seasons are passed in', ()=>{
+    //Arrange
+    render(<Show show={testShow} selectedSeason={'none'}/> )
+
+    ///Act
+    const options = screen.getAllByTestId('season-option')
+
+    //Assert
+    expect(options.length).toEqual(3)
+    expect(options).toBeTruthy()
+    //  screen.debug(options)
 });
 
 test('handleSelect is called when an season is selected', () => {
+    const mockHandleSelect = jest.fn()
+
+    //Arrange
+    render(<Show show={testShow} selectedSeason={'none'} handleSelect={mockHandleSelect}/> )
+
+    //Act
+    const select = screen.getByTestId('select-input')
+
+    userEvent.selectOptions(select, '1');
+    
+    
+    //Assert
+    expect(mockHandleSelect).toHaveBeenCalled();
+    expect(mockHandleSelect).toBeTruthy();
+    // screen.debug()
+
 });
 
 test('component renders when no seasons are selected and when rerenders with a season passed in', () => {
+
+    const {rerender} = render(<Show show={null} 
+    selectedSeason={'none'} 
+    />)
+   
+
+    let seasons = screen.queryAllByTestId('season-option')
+    expect(seasons).toHaveLength(0)
+    expect(seasons).toBeTruthy()
+    
+    rerender(<Show
+        show={testShow} 
+        selectedSeason={"none"} 
+    />)
+    seasons = screen.queryAllByTestId('season-option')
+    expect(seasons).toHaveLength(3)
+    expect(seasons).toBeTruthy()
+   
 });
 
 //Tasks:
